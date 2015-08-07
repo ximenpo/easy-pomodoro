@@ -20,7 +20,7 @@ void loop() {
 
   //led_setflash(logic_.waiting_for_confirmation);
   if (debouncing_.update(timer_.now())) {
-    led_setflash(!led_isflash());
+    led_setblink(!led_isblink());
   }
   led_update(logic_.remain_seconds);
 

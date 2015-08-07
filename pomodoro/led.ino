@@ -28,7 +28,7 @@ static  const int led_xmod[]      = {6000, 600, 60, 10};
 static  const int led_xdiv[]      = {600, 60, 10, 1};
 static  const X_74HC595 led_ctrl  = {{13, 2, 15, MSBFIRST}};
 
-static  bool  led_flash     = false;
+static  bool  led_blink     = false;
 static  unsigned  led_index = 0;
 
 void  led_init() {
@@ -38,19 +38,19 @@ void  led_init() {
   led_ctrl.init();
 }
 
-bool  led_isflash() {
-  return  led_flash;
+bool  led_isblink() {
+  return  led_blink;
 }
 
-void  led_setflash(bool flash) {
-  led_flash = flash;
+void  led_setblink(bool blink) {
+  led_blink = blink;
 }
 
 void  led_update(unsigned value) {
   unsigned  old_index  = (led_index) % (sizeof(led_pins) / sizeof(led_pins[0]));
   unsigned  index      = (++led_index) % (sizeof(led_pins) / sizeof(led_pins[0]));
 
-  if (led_flash) {
+  if (led_blink) {
     // hide 0.5 seconds in flash mode
     if ( (millis() / 500 % 2 == 0)) {
       digitalWrite(led_pins[index], LOW);
