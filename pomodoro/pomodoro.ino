@@ -1,22 +1,32 @@
+#include  "timestamp.h"
+#include  "logic.h"
+#include  "debouncing.h"
 
-extern  void  led_init();
-extern  void  led_setflash(bool flash);
-extern  void  led_update(unsigned value);
+static  logic       logic_;
+static  timestamp   timer_;
+static  debouncing  debouncing_;
 
-extern  void      timer_init();
-extern  void      timer_reset(unsigned seconds);
-extern  unsigned  timer_stamp();
+static  const int   pin_button  = 14;
 
 void setup() {
   led_init();
-  timer_init();
+  logic_.init();
+  timer_.reset(0);
+  debouncing_.init(pin_button);
 }
 
 void loop() {
-  unsigned  stamp = timer_stamp();
-  if (0 == stamp) {
-    led_setflash(true);
+  bool  completed = logic_.update(timer_.now(), false);
+
+  //led_setflash(logic_.waiting_for_confirmation);
+  if (debouncing_.update(timer_.now())) {
+    led_setflash(!led_isflash());
   }
-  led_update(stamp);
+  led_update(logic_.remain_seconds);
+
+  if (completed) {
+    logic_.reset();
+    timer_.reset();
+  }
 }
 

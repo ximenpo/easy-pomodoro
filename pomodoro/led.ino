@@ -38,6 +38,10 @@ void  led_init() {
   led_ctrl.init();
 }
 
+bool  led_isflash() {
+  return  led_flash;
+}
+
 void  led_setflash(bool flash) {
   led_flash = flash;
 }
