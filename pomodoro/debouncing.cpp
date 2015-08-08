@@ -19,7 +19,7 @@ bool  debouncing::update(unsigned long timestamp) {
   }
 
   //  second check
-  PROCEDURE_WAIT_(this, 50, false);
+  PROCEDURE_SLEEP_(this, 50, false);
   if (digitalRead(this->pin) != HIGH) {
     PROCEDURE_STOP_(false);
   }

@@ -2,11 +2,11 @@
 #include  "logic.h"
 #include  "debouncing.h"
 
-static  logic       logic_;
-static  timestamp   timer_;
-static  debouncing  debouncing_;
+static  timestamp<>     timer_;
+static  pomodoro_logic  logic_;
 
-static  const int   pin_button  = 14;
+static  debouncing      debouncing_;
+static  const int       pin_button  = 14;
 
 void setup() {
   led_init();
@@ -16,15 +16,15 @@ void setup() {
 }
 
 void loop() {
-  bool  completed = logic_.update(timer_.now(), false);
+  logic_.update(timer_.now(), false);
 
-  //led_setflash(logic_.waiting_for_confirmation);
+  //led_setflash(logic_.confirming);
   if (debouncing_.update(timer_.now())) {
     led_setblink(!led_isblink());
   }
   led_update(logic_.remain_seconds);
 
-  if (completed) {
+  if (logic_.is_finished()) {
     logic_.reset();
     timer_.reset();
   }
