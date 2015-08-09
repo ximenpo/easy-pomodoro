@@ -6,6 +6,7 @@ class cancel_logic : public procedure_context, timestamp_timing<> {
     bool    confirming;
 
   public:
+    void    reset();
     bool    update(unsigned long timestamp, bool action);
 };
 
