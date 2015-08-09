@@ -27,17 +27,15 @@ static  const unsigned long x_stage_seconds[STAGE_TYPE_SUM] = {
 };
 
 bool  cancel_logic::update(unsigned long timestamp, bool action) {
-  PROCEDURE_BEGIN(this);
+  PROCEDURE_BEGIN_RUNLOOP(this);
 
-  for (;;) {
-    this->confirming  = false;
-    PROCEDURE_WAIT_(action, false);
+  this->confirming  = false;
+  PROCEDURE_WAIT_(action, false);
 
-    this->confirming  = true;
-    PROCEDURE_WAIT_TIMEOUT_(action, this, x_confirm_ms, false);
-    if (action) {
-      break;
-    }
+  this->confirming  = true;
+  PROCEDURE_WAIT_TIMEOUT_(action, this, x_confirm_ms, false);
+  if (action) {
+    PROCEDURE_STOP_(false);
   }
 
   PROCEDURE_END_(true);
