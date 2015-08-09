@@ -3,10 +3,13 @@
 
 class cancel_logic : public procedure_context, timestamp_timing<> {
   public:
+    bool    confirming;
+
+  public:
     bool    update(unsigned long timestamp, bool action);
 };
 
-class pomodoro_logic  : public procedure_context, timestamp_timing<> {
+class pomodoro_logic : public procedure_context, timestamp_timing<> {
   public:
     void    init();
     void    update(unsigned long timestamp, bool action);

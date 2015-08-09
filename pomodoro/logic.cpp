@@ -1,9 +1,10 @@
 #include "logic.h"
 
 // TODO:
-const unsigned  x_work_ms       = 10 * 1000;
-const unsigned  x_relax_ms      = 5 * 1000;
-const unsigned  x_relax_long_ms = 8 * 1000;
+const unsigned  x_confirm_ms    = 5 * 1000;
+const unsigned  x_work_ms       = 30 * 1000;
+const unsigned  x_relax_ms      = 10 * 1000;
+const unsigned  x_relax_long_ms = 15 * 1000;
 const unsigned  x_work_rounds   = 4;
 
 enum  LOGIC_STAGE_TYPE {
@@ -26,8 +27,20 @@ static  const unsigned long x_stage_seconds[STAGE_TYPE_SUM] = {
 };
 
 bool  cancel_logic::update(unsigned long timestamp, bool action) {
-  // TODO:
-  return  false;
+  PROCEDURE_BEGIN(this);
+
+  for (;;) {
+    this->confirming  = false;
+    PROCEDURE_WAIT_(action, false);
+
+    this->confirming  = true;
+    PROCEDURE_WAIT_TIMEOUT_(action, this, x_confirm_ms, false);
+    if (action) {
+      break;
+    }
+  }
+
+  PROCEDURE_END_(true);
 }
 
 void  pomodoro_logic::init() {
@@ -45,7 +58,7 @@ void  pomodoro_logic::update(unsigned long timestamp, bool action) {
 
   this->do_update(timestamp, action);
 
-  this->confirming  = (this->stage == STAGE_CONFIRM);
+  this->confirming  = (this->stage == STAGE_CONFIRM) || cancel.confirming;
   switch (this->stage) {
     case STAGE_WORK:
     case STAGE_RELAX:
