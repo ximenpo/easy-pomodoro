@@ -19,11 +19,11 @@ enum  LOGIC_STAGE_TYPE {
 
 static  const unsigned long x_stage_seconds[STAGE_TYPE_SUM] = {
   x_work_ms,
-  0,
+  x_confirm_ms,
   x_work_ms,
   x_relax_ms,
   x_relax_long_ms,
-  0,
+  x_work_ms,
 };
 
 bool  cancel_logic::update(unsigned long timestamp, bool action) {
@@ -56,12 +56,18 @@ void  pomodoro_logic::update(unsigned long timestamp, bool action) {
 
   this->do_update(timestamp, action);
 
-  this->confirming  = (this->stage == STAGE_CONFIRM) || cancel.confirming;
+  this->confirming  = cancel.confirming;
   switch (this->stage) {
     case STAGE_WORK:
     case STAGE_RELAX:
     case STAGE_RELAX_LONG:
       this->remain_seconds  = (x_stage_seconds[this->stage] - (timestamp - this->start_timestamp)) / 1000;
+      break;
+    case STAGE_CONFIRM:
+      this->confirming  = true;
+      break;
+    default:
+      this->remain_seconds  = x_stage_seconds[this->stage];
   }
 }
 
@@ -74,10 +80,12 @@ void  pomodoro_logic::do_update(unsigned long timestamp, bool action) {
 
   do {
     this->stage = STAGE_NONE; {
+      PROCEDURE_YIELD();
       PROCEDURE_WAIT(action);
     }
 
     this->stage = STAGE_CONFIRM; {
+      PROCEDURE_YIELD();
       PROCEDURE_WAIT_TIMEOUT(action, this, x_stage_seconds[this->stage]);
       if (this->check_expired(x_stage_seconds[this->stage])) {
         continue;
@@ -85,6 +93,7 @@ void  pomodoro_logic::do_update(unsigned long timestamp, bool action) {
     }
 
     this->stage = STAGE_WORK; {
+      PROCEDURE_YIELD();
       cancel.reset();
       PROCEDURE_WAIT_TIMEOUT(cancel.update(timestamp, action), this, x_stage_seconds[this->stage]);
       if (!this->check_expired(x_stage_seconds[this->stage])) {
@@ -93,6 +102,7 @@ void  pomodoro_logic::do_update(unsigned long timestamp, bool action) {
     }
 
     this->stage = STAGE_CONFIRM; {
+      PROCEDURE_YIELD();
       PROCEDURE_WAIT(action);
     }
 
@@ -101,17 +111,20 @@ void  pomodoro_logic::do_update(unsigned long timestamp, bool action) {
     }
 
     this->stage = STAGE_RELAX; {
+      PROCEDURE_YIELD();
       cancel.reset();
       PROCEDURE_WAIT_TIMEOUT(cancel.update(timestamp, action), this, x_stage_seconds[this->stage]);
     }
   } while (++round < x_work_rounds);
 
   this->stage = STAGE_RELAX_LONG; {
+    PROCEDURE_YIELD();
     cancel.reset();
     PROCEDURE_WAIT_TIMEOUT(cancel.update(timestamp, action), this, x_stage_seconds[this->stage]);
   }
 
   this->stage = STAGE_DONE; {
+      PROCEDURE_YIELD();
   }
 
   PROCEDURE_END();
