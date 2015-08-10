@@ -21,6 +21,15 @@ void loop() {
   logic_.update(timer_.now(), button_.update(timer_.now()));
 
   // display using logic result
+  /*
+  if (logic_.confirming) {
+    if (!led_isblink()) {
+      analogWriteFreq(262);
+      analogWrite(12, 1023);
+    }
+  } else {
+    analogWrite(12, 0);
+  }*/
   led_setblink(logic_.confirming);
   led_update(logic_.remain_seconds);
 

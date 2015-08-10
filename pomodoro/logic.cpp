@@ -39,7 +39,6 @@ bool  cancel_logic::update(unsigned long timestamp, bool action) {
   PROCEDURE_WAIT_(action, false);
 
   this->confirming  = true;
-  PROCEDURE_YIELD_(false);
   PROCEDURE_WAIT_TIMEOUT_(action, this, x_confirm_ms, false);
   this->confirming  = false;
   if (!action) {
@@ -90,12 +89,10 @@ void  pomodoro_logic::do_update(unsigned long timestamp, bool action) {
 
   while (round < x_work_rounds) {
     this->stage = STAGE_NONE; {
-      PROCEDURE_YIELD();
       PROCEDURE_WAIT(action);
     }
 
     this->stage = STAGE_CONFIRM; {
-      PROCEDURE_YIELD();
       PROCEDURE_WAIT_TIMEOUT(action, this, x_stage_seconds[this->stage]);
       if (this->check_expired(x_stage_seconds[this->stage])) {
         continue;
@@ -103,7 +100,6 @@ void  pomodoro_logic::do_update(unsigned long timestamp, bool action) {
     }
 
     this->stage = STAGE_WORK; {
-      PROCEDURE_YIELD();
       cancel.reset();
       PROCEDURE_WAIT_TIMEOUT(cancel.update(timestamp, action), this, x_stage_seconds[this->stage]);
       cancel.reset();
@@ -113,7 +109,6 @@ void  pomodoro_logic::do_update(unsigned long timestamp, bool action) {
     }
 
     this->stage = STAGE_CONFIRM; {
-      PROCEDURE_YIELD();
       PROCEDURE_WAIT(action);
     }
 
@@ -122,7 +117,6 @@ void  pomodoro_logic::do_update(unsigned long timestamp, bool action) {
     }
 
     this->stage = STAGE_RELAX; {
-      PROCEDURE_YIELD();
       cancel.reset();
       PROCEDURE_WAIT_TIMEOUT(cancel.update(timestamp, action), this, x_stage_seconds[this->stage]);
       cancel.reset();
@@ -132,7 +126,6 @@ void  pomodoro_logic::do_update(unsigned long timestamp, bool action) {
   }
 
   this->stage = STAGE_RELAX_LONG; {
-    PROCEDURE_YIELD();
     cancel.reset();
     PROCEDURE_WAIT_TIMEOUT(cancel.update(timestamp, action), this, x_stage_seconds[this->stage]);
     cancel.reset();
