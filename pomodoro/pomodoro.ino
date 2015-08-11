@@ -4,21 +4,21 @@
 #include  "logic.h"
 
 static  timestamp<>     timer_;
-static  debouncing<>    button_;
+static  debouncing<>    btn_;
 static  pomodoro_logic  logic_;
 
 static  const int       pin_button  = 14;
 
 void setup() {
   led_init();
-  button_.init(pin_button, HIGH);
+  btn_.init(pin_button);
   logic_.init();
   timer_.reset(0);
 }
 
 void loop() {
   // update logic with tow input: time and button
-  logic_.update(timer_.now(), button_.update(timer_.now()));
+  logic_.update(timer_.now(), btn_.check_click(timer_.now(), HIGH));
 
   // display using logic result
   /*
