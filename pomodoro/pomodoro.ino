@@ -14,13 +14,17 @@ static  timing<>        timing_alert_;
 static  const int       pin_button  = 14;
 static  const int       pin_alert   = 12;
 
+static  bool      alerting    = false;
+
 void setup() {
+  pinMode(pin_alert, OUTPUT);
+  digitalWrite(pin_alert, LOW);
+
   led_init();
   btn_.init(pin_button);
   logic_.init();
   timer_.reset(0);
 
-  pinMode(pin_alert, OUTPUT);
   timing_confirm_.init();
   timing_alert_.init();
 
@@ -44,19 +48,25 @@ void loop() {
       } else {
         timing_confirm_.reset();
       }
+      alerting  = true;
       digitalWrite(pin_alert, HIGH);
     }
     // check & stop alert
     if (timing_alert_.check_periodic(timestamp, 500, 10)) {
       alert_status  = !alert_status;
-      //digitalWrite(pin_alert, alert_status ? HIGH : LOW);
+      digitalWrite(pin_alert, alert_status ? HIGH : LOW);
     }
     if (timing_confirm_.check_timeout(timestamp, 1000)) {
+      alerting  = false;
       digitalWrite(pin_alert, LOW);
     }
-  } else {
+  } else if (alerting) {
     digitalWrite(pin_alert, LOW);
+    alerting  = false;
+    timing_confirm_.done();
+    timing_alert_.done();
   }
+  
   led_setblink(logic_.confirming);
   led_update(logic_.remain_seconds);
 
