@@ -52,7 +52,7 @@ void loop() {
       digitalWrite(pin_alert, HIGH);
     }
     // check & stop alert
-    if (timing_alert_.check_periodic(timestamp, 500, 10)) {
+    if (timing_alert_.check_periodic(timestamp, 500, 11)) {
       alert_status  = !alert_status;
       digitalWrite(pin_alert, alert_status ? HIGH : LOW);
     }
@@ -66,7 +66,7 @@ void loop() {
     timing_confirm_.done();
     timing_alert_.done();
   }
-  
+
   led_setblink(logic_.confirming);
   led_update(logic_.remain_seconds);
 
