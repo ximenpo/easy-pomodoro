@@ -1,10 +1,10 @@
 #include "logic.h"
 
 // TODO:
-const unsigned  x_confirm_ms    = 5 * 1000;
-const unsigned  x_work_ms       = 30 * 1000;
-const unsigned  x_relax_ms      = 10 * 1000;
-const unsigned  x_relax_long_ms = 15 * 1000;
+const unsigned  long  x_confirm_ms    = 5  * 1000;
+const unsigned  long  x_work_ms       = 25 * 60 * 1000;
+const unsigned  long  x_relax_ms      = 5 * 60 * 1000;
+const unsigned  long  x_relax_long_ms = 15 * 60 * 1000;
 const unsigned  x_work_rounds   = 4;
 
 enum  LOGIC_STAGE_TYPE {
