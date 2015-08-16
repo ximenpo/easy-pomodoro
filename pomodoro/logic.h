@@ -1,3 +1,6 @@
+#ifndef _POMODORO_LOGIC_H_
+#define _POMODORO_LOGIC_H_
+
 #include  <procedure.h>
 #include  <timestamp.h>
 
@@ -27,3 +30,4 @@ class pomodoro_logic : public procedure_context, timestamp_timing<> {
     cancel_logic  cancel;
 };
 
+#endif

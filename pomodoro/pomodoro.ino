@@ -2,6 +2,7 @@
 #include  <debouncing.h>
 #include  <timing.h>
 
+#include  "config.h"
 #include  "logic.h"
 
 static  timestamp<>     timer_;
@@ -11,14 +12,11 @@ static  pomodoro_logic  logic_;
 static  timing<>        timing_confirm_;
 static  timing<>        timing_alert_;
 
-static  const int       pin_button  = 14;
-static  const int       pin_alert   = 12;
-
 static  bool      alerting    = false;
 
 void setup() {
-  pinMode(pin_alert, OUTPUT);
-  digitalWrite(pin_alert, LOW);
+  pinMode(pin_buzzer, OUTPUT);
+  digitalWrite(pin_buzzer, LOW);
 
   led_init();
   btn_.init(pin_button);
@@ -49,19 +47,19 @@ void loop() {
         timing_confirm_.reset();
       }
       alerting  = true;
-      digitalWrite(pin_alert, HIGH);
+      digitalWrite(pin_buzzer, HIGH);
     }
     // check & stop alert
     if (timing_alert_.check_periodic(timestamp, 500, 11)) {
       alert_status  = !alert_status;
-      digitalWrite(pin_alert, alert_status ? HIGH : LOW);
+      digitalWrite(pin_buzzer, alert_status ? HIGH : LOW);
     }
     if (timing_confirm_.check_timeout(timestamp, 1000)) {
       alerting  = false;
-      digitalWrite(pin_alert, LOW);
+      digitalWrite(pin_buzzer, LOW);
     }
   } else if (alerting) {
-    digitalWrite(pin_alert, LOW);
+    digitalWrite(pin_buzzer, LOW);
     alerting  = false;
     timing_confirm_.done();
     timing_alert_.done();
