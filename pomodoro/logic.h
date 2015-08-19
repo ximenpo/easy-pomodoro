@@ -4,6 +4,8 @@
 #include  <procedure.h>
 #include  <timestamp.h>
 
+class logic_config;
+
 class cancel_logic : public procedure_context, timestamp_timing<> {
   public:
     bool    confirming;
@@ -15,7 +17,7 @@ class cancel_logic : public procedure_context, timestamp_timing<> {
 
 class pomodoro_logic : public procedure_context, timestamp_timing<> {
   public:
-    void    init();
+    void    init(const logic_config& cfg);
     void    update(unsigned long timestamp, bool action);
 
   public:

@@ -3,9 +3,10 @@
 
 #include  <cstdint>
 
-struct  Config {
+class  logic_config {
   public:
     uint8_t   __storage_begin__;
+    uint8_t   confirm_seconds;
     uint8_t   work_minites;
     uint8_t   break_minites;
     uint8_t   long_break_minites;
