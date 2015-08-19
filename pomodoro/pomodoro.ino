@@ -2,7 +2,7 @@
 #include  <debouncing.h>
 #include  <timing.h>
 
-#include  "config.h"
+#include  "hw-define.h"
 #include  "logic.h"
 
 static  timestamp<>     timer_;
