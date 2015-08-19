@@ -17,6 +17,8 @@ static  timing<>        timing_alert_;
 static  bool      alerting    = false;
 
 void  running_setup() {
+  WiFi.mode(WIFI_STA);
+  
   pinMode(pin_buzzer, OUTPUT);
   digitalWrite(pin_buzzer, LOW);
 

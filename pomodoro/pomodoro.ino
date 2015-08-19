@@ -1,3 +1,5 @@
+#include  <ESP8266WiFi.h>
+
 #include  <procedure.h>
 #include  "hw-define.h"
 
