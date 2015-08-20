@@ -4,12 +4,10 @@
 
 #include  "hw-define.h"
 #include  "logic.h"
-#include  "logic-config.h"
 
 static  timestamp<>     timer_;
 static  debouncing<>    btn_;
 static  pomodoro_logic  logic_;
-static  logic_config    config_;
 
 static  timing<>        timing_confirm_;
 static  timing<>        timing_alert_;
@@ -18,12 +16,9 @@ static  bool      alerting    = false;
 
 void  running_setup() {
   WiFi.mode(WIFI_STA);
-  
+
   pinMode(pin_buzzer, OUTPUT);
   digitalWrite(pin_buzzer, LOW);
-
-  config_.init();
-  config_.load();
 
   led_init();
   btn_.init(pin_button);

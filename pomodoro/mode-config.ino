@@ -6,36 +6,73 @@ static  IPAddress          ap_ip_(192, 168, 1, 1);
 static  DNSServer           dns_;
 static  ESP8266WebServer  web_(80);
 
+static  const char*   html_root = R"(
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>pomodoro config</title>
+  <style>
+    body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }
+  </style>
+ </head>
+
+ <body>
+  <form method="post" action="/config">
+  
+  </form>
+
+ </body>
+</html>
+)";
+
+void  web_notfound() {
+  web_.send(404, "text/plain", "not found");
+}
+
+void  web_root() {
+  web_.send(200, "text/html", html_root);
+}
+
+void  web_js() {
+  web_.send(200, "text/html", "alert('ok')");
+}
+
+void  web_config() {
+  if (web_.method() != HTTP_POST) {
+    web_notfound();
+    return;
+  }
+
+  web_.send(200, "text/plain", "配置更新成功, 正在重启设备 ...");
+}
+
 void  config_setup() {
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(ap_ip_, ap_ip_, IPAddress(255, 255, 255, 0));
-  WiFi.softAP("pomodoro", "123456");
+  WiFi.softAP(config_.ap_ssid, config_.ap_password);
 
-  // modify TTL associated  with the domain name (in seconds)
-  // default is 60 seconds
-  dns_.setTTL(300);
-  // set which return code will be used for all other domains (e.g. sending
-  // ServerFailure instead of NonExistentDomain will reduce number of queries
-  // sent by clients)
-  // default is DNSReplyCode::NonExistentDomain
-  dns_.setErrorReplyCode(DNSReplyCode::ServerFailure);
+  {
+    dns_.setTTL(300);
+    dns_.start(DNS_PORT, "*", ap_ip_);
+  }
 
-  // start DNS server for a specific domain name
-  dns_.start(DNS_PORT, "pomodoro", ap_ip_);
+  {
+    web_.on("/", web_root);
+    web_.on("/js", web_js);
+    web_.on("/config", web_config);
+    web_.onNotFound(web_notfound);
+    web_.begin();
+  }
 
-  // simple HTTP server to see that DNS server is working
-  web_.onNotFound([]() {
-    String message = "pomodoro now!\n\n";
-    message += "URI: ";
-    message += web_.uri();
-
-    web_.send(200, "text/plain", message);
-  });
-  web_.begin();
+  led_init();
+  led_setblink(true);
 }
 
 void  config_loop() {
-  dns_.processNextRequest();
   web_.handleClient();
+
+  dns_.processNextRequest();
+  led_config_update();
 }
 

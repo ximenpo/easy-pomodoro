@@ -46,7 +46,7 @@ void  led_setblink(bool blink) {
   led_blink = blink;
 }
 
-void  led_update(unsigned value) {
+void  led_update_code(unsigned  code) {
   unsigned  old_index  = (led_index) % (sizeof(led_pins) / sizeof(led_pins[0]));
   unsigned  index      = (++led_index) % (sizeof(led_pins) / sizeof(led_pins[0]));
 
@@ -58,13 +58,23 @@ void  led_update(unsigned value) {
     }
   }
 
-  // display clock digits
-  unsigned  number  = value % led_xmod[index] / led_xdiv[index];
-  unsigned  code    = CA7S_CODE_WITH_DOT(led_number_code[number]);
+  // display clock code
   digitalWrite(led_pins[old_index], LOW);
   _74HC595_BEGIN(led_ctrl.data);
   _74HC595_WRITE(led_ctrl.data, code);
   _74HC595_END(led_ctrl.data);
   digitalWrite(led_pins[index], HIGH);
+}
+
+void  led_config_update() {
+  unsigned  code    = CA7S_CODE_WITH_DOT(CA7S_CODE(MINUS));
+  led_update_code(code);
+}
+
+void  led_update(unsigned value) {
+  unsigned  index   = (led_index + 1) % (sizeof(led_pins) / sizeof(led_pins[0]));
+  unsigned  number  = value % led_xmod[index] / led_xdiv[index];
+  unsigned  code    = CA7S_CODE_WITH_DOT(led_number_code[number]);
+  led_update_code(code);
 }
 

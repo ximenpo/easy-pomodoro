@@ -2,12 +2,18 @@
 
 #include  <procedure.h>
 #include  "hw-define.h"
+#include  "logic-config.h"
+
+static  logic_config    config_;
 
 static  bool  is_config_mode  = false;
 static  void  (*func_setup)() = 0;
 static  void  (*func_loop)() = 0;
 
 void setup() {
+  config_.init();
+  config_.load();
+
   unsigned  long  start = millis();
   do {
     if (digitalRead(pin_button) == HIGH) {
