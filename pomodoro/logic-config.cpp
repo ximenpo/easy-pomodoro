@@ -17,6 +17,9 @@ void logic_config::init() {
   memset(this->wifi_ssid, 0, sizeof(this->wifi_ssid));
   memset(this->wifi_password, 0, sizeof(this->wifi_password));
 
+  memset(this->app_id, 0, sizeof(this->app_id));
+  memset(this->app_key, 0, sizeof(this->app_key));
+
   this->work_minites          = 25;
   this->break_minites         = 5;
   this->long_break_minites    = 15;

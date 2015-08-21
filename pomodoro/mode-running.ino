@@ -1,16 +1,13 @@
-#include  <timestamp.h>
+
 #include  <debouncing.h>
-#include  <timing.h>
 
 #include  "hw-define.h"
 #include  "logic.h"
 
-static  timestamp<>     timer_;
 static  debouncing<>    btn_;
 static  pomodoro_logic  logic_;
 
-static  timing<>        timing_confirm_;
-static  timing<>        timing_alert_;
+static  timing<>        buzz_;
 
 static  bool      alerting    = false;
 
@@ -23,13 +20,12 @@ void  running_setup() {
   led_init();
   btn_.init(pin_button);
   logic_.init(config_);
-  timer_.reset(0);
 
-  timing_confirm_.init();
-  timing_alert_.init();
-
-  timing_confirm_.done();
-  timing_alert_.done();
+  timeout_.init();
+  timeout_.done();
+  
+  buzz_.init();
+  buzz_.done();
 }
 
 void  running_loop() {
@@ -44,27 +40,27 @@ void  running_loop() {
       // begin alert
       if (logic_.remain_seconds == 0) {
         alert_status  = true;
-        timing_alert_.reset();
+        buzz_.reset();
       } else {
-        timing_confirm_.reset();
+        timeout_.reset();
       }
       alerting  = true;
       digitalWrite(pin_buzzer, HIGH);
     }
     // check & stop alert
-    if (timing_alert_.check_periodic(timestamp, 500, 11)) {
+    if (buzz_.check_periodic(timestamp, 500, 11)) {
       alert_status  = !alert_status;
       digitalWrite(pin_buzzer, alert_status ? HIGH : LOW);
     }
-    if (timing_confirm_.check_timeout(timestamp, 1000)) {
+    if (timeout_.check_timeout(timestamp, 1000)) {
       alerting  = false;
       digitalWrite(pin_buzzer, LOW);
     }
   } else if (alerting) {
     digitalWrite(pin_buzzer, LOW);
     alerting  = false;
-    timing_confirm_.done();
-    timing_alert_.done();
+    timeout_.done();
+    buzz_.done();
   }
 
   led_setblink(logic_.confirming);
