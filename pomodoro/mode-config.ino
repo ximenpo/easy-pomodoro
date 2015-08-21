@@ -1,9 +1,5 @@
-#include  <DNSServer.h>
-#include  <ESP8266WebServer.h>
 
-static  const byte          DNS_PORT = 53;
 static  IPAddress          ap_ip_(192, 168, 1, 1);
-static  DNSServer           dns_;
 static  ESP8266WebServer  web_(80);
 
 void  web_root() {
@@ -142,11 +138,6 @@ void  config_setup() {
   WiFi.softAP(config_.ap_ssid, config_.ap_password);
 
   {
-    dns_.setTTL(300);
-    dns_.start(DNS_PORT, "*", ap_ip_);
-  }
-
-  {
     web_.on("/", web_root);
     web_.on("/data.js", web_js);
     web_.on("/style.css", web_css);
@@ -165,7 +156,6 @@ void  config_setup() {
 void  config_loop() {
   web_.handleClient();
 
-  dns_.processNextRequest();
   led_config_update();
 
   if (timeout_.check_timeout(timer_.now(), 1000)) {
