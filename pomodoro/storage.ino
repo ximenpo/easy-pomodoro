@@ -19,8 +19,9 @@ bool  storage_load(uint8_t* begin, uint8_t* end) {
   StorageHead  head;
 
   //  read head
-  for (size_t i = 0; i < sizeof(head); ++i) {
-    *((uint8_t*)&head)  = EEPROM.read(i);
+  uint8_t*  pHead = (uint8_t*)&head;
+  for (size_t i = 0; i < sizeof(head); ++i, ++pHead) {
+    *pHead  = EEPROM.read(i);
   }
 
   if ( (0 != memcmp(head.tag, STORAGE_TAG, sizeof(STORAGE_TAG)))
@@ -56,7 +57,6 @@ void  storage_save(uint8_t* begin, uint8_t* end) {
     EEPROM.write(i, *(pHead + i));
   }
 
-  uint8_t*  pData = (uint8_t*)&head;
   for (size_t i = 0; i < head.data_size; ++i) {
     EEPROM.write(i + sizeof(head), *(begin + i));
   }

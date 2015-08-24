@@ -9,7 +9,6 @@
 #include  "logic-config.h"
 
 static  logic_config    config_;
-static  timing<>        timeout_;
 static  timestamp<>     timer_;
 
 static  bool  is_config_mode  = false;
@@ -33,7 +32,6 @@ void setup() {
     func_loop   = is_config_mode  ? config_loop   : running_loop;
   }
 
-  timer_.reset(0);
   func_setup();
 }
 

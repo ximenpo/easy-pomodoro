@@ -12,7 +12,7 @@ class  logic_config {
 
     char      wifi_ssid[32];        // max 31 bytes
     char      wifi_password[64];    // max 63 bytes
-    
+
     char      app_id[32];           // max 31 bytes
     char      app_key[64];          // max 63 bytes
 

@@ -1,4 +1,6 @@
 
+static  timing<>            timeout_;
+
 static  IPAddress          ap_ip_(192, 168, 1, 1);
 static  ESP8266WebServer  web_(80);
 
@@ -132,10 +134,10 @@ void  web_config() {
   do {
     uint8_t tmp;
     if (!web_arg_read_string(config_.wifi_ssid, sizeof(config_.wifi_ssid), "wifi_ssid")) break;
-    if (!web_arg_read_string(config_.wifi_ssid, sizeof(config_.wifi_ssid), "wifi_password")) break;
+    if (!web_arg_read_string(config_.wifi_password, sizeof(config_.wifi_password), "wifi_password")) break;
 
-    if (!web_arg_read_string(config_.wifi_ssid, sizeof(config_.wifi_ssid), "app_id")) break;
-    if (!web_arg_read_string(config_.wifi_ssid, sizeof(config_.wifi_ssid), "app_key")) break;
+    if (!web_arg_read_string(config_.app_id, sizeof(config_.app_id), "app_id")) break;
+    if (!web_arg_read_string(config_.app_key, sizeof(config_.app_key), "app_key")) break;
 
     if (!web_arg_read_uint8(&config_.work_minites, "work_minites", 1, 255))break;
     if (!web_arg_read_uint8(&config_.break_minites, "break_minites", 1, 255))break;
@@ -147,11 +149,12 @@ void  web_config() {
     config_.slient_mode = (tmp == 0) ? 1 : 0;
 
     // all right, restart now
-    //timeout_.reset();
     config_.save();
+    timeout_.reset();
     web_.send(200, "text/html", ""
               "<html><head>"
               "<meta charset='utf-8'>"
+              "<meta http-equiv='refresh' content='5;url=/'>"
               "</head>"
               "<body>"
               "配置更新成功, 正在重启设备 ..."
@@ -187,16 +190,23 @@ void  config_setup() {
 
   led_init();
   led_setblink(true);
+
+  buzzer_init();
+  buzzer_start(false, 800);
 }
 
 void  config_loop() {
-  if (timeout_.check_timeout(timer_.now(), 500)) {
+  uint32_t  timestamp = timer_.now();
+  if (timeout_.check_timeout(timestamp, 500)) {
     config_.save();
+    WiFi.mode(WIFI_STA);
     ESP.restart();
+    return;
   }
 
   web_.handleClient();
 
   led_config_update();
+  buzzer_update(timestamp);
 }
 
