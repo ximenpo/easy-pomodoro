@@ -30,10 +30,11 @@ void logic_config::init() {
 }
 
 void logic_config::load() {
-  storage_load(&this->__storage_begin__, &this->__storage_end__);
+  if (!storage_load(&this->__storage_begin__, &this->__storage_end__)) {
+    this->init();
+  }
 }
 
 void logic_config::save() {
   storage_save(&this->__storage_begin__, &this->__storage_end__);
 }
-
